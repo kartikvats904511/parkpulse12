@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARK PULSE</title>
+</head>
+
+<style>
+    /* =========================================
+   PARK PULSE — AESTHETIC SMART PARKING UI
+   ========================================= */
+
+    * {
+        margin: 100;
+        padding: 100;
+        box-sizing: border-box;
+    }
+
+    :root {
+        --bg: #06101d;
+        --card: rgba(255, 255, 255, 0.94);
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: rgba(148, 163, 184, 0.22);
+
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #eff6ff;
+
+        --cyan: #06b6d4;
+        --green: #16a34a;
+        --green-light: #ecfdf5;
+
+        --red: #dc2626;
+        --red-light: #fef2f2;
+
+        --orange: #f59e0b;
+        --orange-light: #fffbeb;
+
+        --shadow: 0 20px 50px rgba(2, 8, 23, 0.18);
+        --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.10);
+    }
+
+    body {
+        font-family: Inter, Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(circle at 10% 0%, rgba(37, 99, 235, 0.35), transparent 30%),
+            radial-gradient(circle at 90% 10%, rgba(6, 182, 212, 0.22), transparent 25%),
+            linear-gradient(135deg, #020617, #071426 50%, #0a192c);
+        color: white;
+        min-height: 100vh;
+        line-height: 1.5;
+        overflow-x: hidden;
+    }
+
+    body > button.login-btn {
+        position: fixed;
+        top: 18px;
+        right: 28px;
+        z-index: 1000;
+        padding: 11px 18px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+        cursor: pointer;
+        transition: 0.25s ease;
+    }
+
+    body > button.login-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 32px rgba(37, 99, 235, 0.45);
+    }
+
+    #time, #date {
+        position: fixed;
+        z-index: 999;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(14px);
+        border-radius: 10px;
+        padding: 6px 11px;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    #time { top: 20px; left: 28px; color: #67e8f9; font-weight: 800; }
+    #date { top: 52px; left: 28px; color: #cbd5e1; }
+
+    header {
+        width: 92%;
+        max-width: 1450px;
+        margin: 100px auto 0;
+        padding: 55px 55px 60px;
+        position: relative;
+        border-radius: 30px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.94));
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
+
+    header::before {
+        content: "";
+        position: absolute;
+        width: 350px; height: 350px;
+        top: -180px; right: -100px;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.18), transparent 70%);
+        border-radius: 50%;
+    }
+
+    header::after {
+        content: "";
+        position: absolute;
+        width: 250px; height: 250px;
+        bottom: -140px; left: -80px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.12), transparent 70%);
+        border-radius: 50%;
+    }
+
+    header > img {
+        position: relative;
+        z-index: 2;
+        display: block;
+        width: 110px; height: 110px;
+        object-fit: contain;
+        margin: 0 auto 18px;
+        padding: 10px;
+        border-radius: 28px;
+        background: linear-gradient(145deg, #ffffff, #eaf2ff);
+        border: 1px solid rgba(37, 99, 235, 0.12);
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.18);
+        transition: 0.3s ease;
+    }
+
+    header > img:hover {
+        transform: translateY(-5px) rotate(-2deg);
+        box-shadow: 0 20px 45px rgba(37, 99, 235, 0.28);
+    }
+
+    header > h1 {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        font-size: clamp(38px, 5vw, 64px);
+        font-weight: 900;
+        letter-spacing: -3px;
+        margin-bottom: 12px;
+        background: linear-gradient(90deg, #0f172a, #2563eb, #06b6d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    header > pre {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        white-space: pre-wrap;
+        font-family: Inter, Arial, sans-serif;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+        margin-bottom: 35px;
+    }
+
+    main {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 0 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    main > div {
+        background: rgba(248, 250, 252, 0.9);
+        border: 1px solid #e2e8f0;
+        padding: 17px;
+        border-radius: 15px;
+        transition: 0.25s ease;
+    }
+
+    main > div:hover {
+        border-color: rgba(37, 99, 235, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
+    }
+
+    label {
+        display: block;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        border: 1px solid #dbe3ed;
+        background: white;
+        color: #0f172a;
+        border-radius: 11px;
+        padding: 12px 13px;
+        outline: none;
+        font-family: inherit;
+        font-size: 13px;
+        transition: 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        transform: translateY(-1px);
+    }
+
+    textarea { resize: vertical; min-height: 100px; }
+
+    main section {
+        grid-column: 1 / -1;
+        background: linear-gradient(145deg, #ffffff, #f8fbff);
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    main section h2 { font-size: 21px; color: #0f172a; margin-bottom: 18px; }
+
+    main section label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 13px 15px;
+        margin-bottom: 9px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        text-transform: none;
+        font-size: 12px;
+        color: #334155;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    main section label:hover {
+        background: var(--primary-light);
+        border-color: #93c5fd;
+        transform: translateX(4px);
+    }
+
+    main section input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); }
+    input[type="radio"] { width: 17px; height: 17px; accent-color: var(--primary); margin-right: 5px; }
+
+    video {
+        display: block;
+        width: min(100%, 500px);
+        height: 260px;
+        object-fit: cover;
+        margin: 28px auto 20px;
+        border-radius: 20px;
+        border: 4px solid white;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+        background: #020617;
+    }
+
+    a { color: var(--primary); font-weight: 800; text-decoration: none; transition: 0.2s ease; }
+    a:hover { color: var(--cyan); text-decoration: underline; }
+
+    button[type="submit"] {
+        width: 100%;
+        margin-top: 10px;
+        padding: 15px 20px;
+        border: none;
+        border-radius: 13px;
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        color: white;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.28);
+        cursor: pointer;
+        transition: 0.25s ease;
+    }
+
+    button[type="submit"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 32px rgba(37, 99, 235, 0.38);
+    }
+
+    body > h3 {
+        width: 92%;
+        max-width: 1450px;
+        margin: 45px auto 20px;
+        text-align: center;
+        color: white;
+        font-size: clamp(28px, 4vw, 48px);
+        letter-spacing: -1.5px;
+        line-height: 1.15;
+    }
+
+    .reliability, .parking-history {
+        width: 92%;
+        max-width: 1450px;
+        margin: 22px auto;
+        padding: 28px;
+        background: rgba(255, 255, 255, 0.96);
+        color: var(--text);
+        border-radius: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: var(--shadow);
+    }
+
+    .reliability h2, .parking-history h2 { color: #0f172a; font-size: 21px; margin-bottom: 18px; }
+
+    .status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #eef2f7;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status:last-child { border-bottom: none; }
+
+    .status strong {
+        color: var(--green);
+        background: var(--green-light);
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 10px;
+    }
+
+    .parking-history p { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+
+    .history-btn {
+        display: inline-block;
+        padding: 11px 18px;
+        border-radius: 11px;
+        background: var(--primary-light);
+        color: var(--primary);
+        font-size: 11px;
+        font-weight: 900;
+        transition: 0.2s ease;
+    }
+
+    .history-btn:hover {
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    body > h4 {
+        width: 92%;
+        max-width: 1450px;
+        margin: 45px auto 15px;
+        color: #67e8f9;
+        font-size: 12px;
+        letter-spacing: 2px;
+    }
+
+    body > ul.today-list {
+        width: 92%;
+        max-width: 1450px;
+        margin: 7px auto;
+        color: #cbd5e1;
+        font-size: 13px;
+        list-style-position: inside;
+    }
+
+    table {
+        width: 92%;
+        max-width: 1450px;
+        margin: 25px auto 60px;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.97);
+        color: #0f172a;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    }
+
+    thead { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; }
+
+    th { padding: 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+    td { padding: 15px 16px; border-bottom: 1px solid #eef2f7; font-size: 12px; font-weight: 600; }
+
+    tbody tr:hover { background: #f8fbff; }
+    tbody tr:last-child td { border-bottom: none; }
+    td:last-child { text-transform: uppercase; font-size: 10px; font-weight: 900; color: var(--green); }
+
+    footer { text-align: center; padding: 30px; color: #94a3b8; font-size: 10px; }
+
+    .progress-section { max-width: 600px; margin: 40px auto; padding: 25px; text-align: center; color: white; }
+    .progress-section h2 { margin-bottom: 20px; }
+
+    .progress-container {
+        width: 100%;
+        height: 25px;
+        background-color: #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        width: 78%;
+        height: 100%;
+        background-color: #16a34a;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        transition: width 0.4s ease;
+    }
+
+    .progress-section p { margin-top: 12px; font-size: 16px; }
+
+    .slot-picker {
+        width: 92%;
+        max-width: 1450px;
+        margin: 25px auto 60px;
+        padding: 28px;
+        background: rgba(255, 255, 255, 0.97);
+        color: var(--text);
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    }
+
+    .slot-picker h2 { font-size: 21px; margin-bottom: 16px; }
+
+    .legend {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .legend div { display: flex; align-items: center; gap: 6px; }
+
+    .legend-box { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .legend-box.free { background: var(--green); }
+    .legend-box.occupied { background: var(--red); }
+    .legend-box.selected { background: var(--primary); }
+
+    .parking-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .parking-slot {
+        min-height: 90px;
+        border: 2px solid #86efac;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #f0fdf4, #ffffff);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .parking-slot:hover { transform: translateY(-3px); }
+
+    .parking-slot.occupied {
+        border-color: #fca5a5;
+        background: linear-gradient(145deg, #fef2f2, #ffffff);
+        cursor: not-allowed;
+    }
+
+    .parking-slot.selected {
+        border-color: var(--primary);
+        background: linear-gradient(145deg, #eff6ff, #ffffff);
+        box-shadow: 0 0 0 3px #bfdbfe;
+    }
+
+    .slot-name { font-size: 15px; font-weight: 800; }
+    .slot-status { font-size: 10px; font-weight: 800; color: var(--green); letter-spacing: 0.5px; }
+    .occupied .slot-status { color: var(--red); }
+    .selected .slot-status { color: var(--primary); }
+
+    .vehicle-price-select {
+        margin-bottom: 18px;
+        max-width: 320px;
+    }
+
+    .vehicle-price-select label {
+        color: #334155;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+    }
+
+    .vehicle-price-select select {
+        width: 100%;
+        border: 1px solid #dbe3ed;
+        background: white;
+        color: #0f172a;
+        border-radius: 11px;
+        padding: 12px 13px;
+        font-size: 13px;
+    }
+
+    .booking-box {
+        margin-top: 22px;
+        padding: 18px;
+        border-radius: 14px;
+        background: var(--primary-light);
+        text-align: center;
+    }
+
+    .booking-box p { margin-bottom: 10px; font-weight: 700; }
+
+    .booking-price {
+        color: var(--primary);
+        font-size: 20px !important;
+        font-weight: 900 !important;
+    }
+
+    .booking-actions { display: flex; justify-content: center; gap: 12px; }
+
+    .book-btn, .cancel-btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .book-btn { background: var(--primary); color: white; }
+    .cancel-btn { background: #e2e8f0; color: #334155; }
+
+    .my-bookings {
+        margin-top: 26px;
+        padding-top: 20px;
+        border-top: 1px solid #eef2f7;
+    }
+
+    .my-bookings h3 { font-size: 16px; margin-bottom: 4px; }
+    .bookings-hint { color: var(--muted); font-size: 11px; margin-bottom: 14px; }
+    .no-bookings { color: var(--muted); font-size: 12px; }
+
+    .booking-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        background: var(--green-light);
+        border: 1px solid #bbf7d0;
+    }
+
+    .booking-item.expired {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+    }
+
+    .booking-item-info { font-size: 12px; color: #0f172a; }
+    .booking-item-info strong { display: block; font-size: 14px; margin-bottom: 2px; }
+    .booking-item-info span { color: var(--muted); }
+
+    .booking-item .cancel-btn {
+        flex-shrink: 0;
+        background: var(--red);
+        color: white;
+        padding: 8px 16px;
+    }
+
+    .booking-item .cancel-btn:disabled {
+        background: #cbd5e1;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 600px) {
+        .parking-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .faq { max-width: 700px; margin: 50px auto; padding: 25px; }
+    .faq h2 { text-align: center; margin-bottom: 20px; }
+    .faq details { border-bottom: 1px solid #ddd; padding: 15px 0; }
+    .faq summary { cursor: pointer; font-weight: bold; font-size: 16px; }
+    .faq p { color: #cbd5e1; line-height: 1.6; margin-top: 12px; }
+
+    @media (max-width: 1000px) {
+        main { grid-template-columns: 1fr; }
+        main section { grid-column: auto; }
+    }
+
+    @media (max-width: 600px) {
+        body > button.login-btn { top: 14px; right: 15px; padding: 9px 12px; }
+        #time { top: 17px; left: 15px; }
+        #date { top: 47px; left: 15px; }
+        header { width: 94%; margin-top: 95px; padding: 35px 18px 40px; border-radius: 23px; }
+        header > img { width: 90px; height: 90px; }
+        header > h1 { font-size: 40px; letter-spacing: -2px; }
+        header > pre { font-size: 12px; }
+        main { grid-template-columns: 1fr; }
+        main section { padding: 18px; }
+        body > h3 { width: 92%; margin-top: 35px; font-size: 30px; }
+        .reliability, .parking-history { width: 94%; padding: 20px; border-radius: 18px; }
+        .status { align-items: flex-start; flex-direction: column; gap: 7px; }
+        table { width: 94%; }
+        th, td { padding: 12px 9px; }
+        video { height: 210px; }
+    }
+</style>
+
+<body>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hamburger Menu Example</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
+
+  /* 3 bars icon */
+  .menu-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+  .menu-icon span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: #000;
+    margin: 5px 0;
+    border-radius: 2px;
+  }
+
+  /* sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    overflow: hidden;
+    transition: width 0.3s ease;
+  }
+  .sidebar.open {
+    width: 220px;
+  }
+  .sidebar-content {
+    width: 220px;
+    padding: 60px 16px 16px;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+    font-size: 15px;
+    color: #222;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+  .menu-item:hover {
+    background: #f2f2f2;
+  }
+  .menu-item.logout {
+    color: #d9342b;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 3 bar icon -->
+  <div class="menu-icon" id="menuIcon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <!-- sidebar that opens -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-content">
+      <div class="menu-item">Chats</div>
+      <div class="menu-item">Advanced settings</div>
+      <div class="menu-item">Settings</div>
+      <div class="menu-item logout">Log out</div>
+    </div>
+  </div>
+
+  <script>
+    const menuIcon = document.getElementById('menuIcon');
+    const sidebar = document.getElementById('sidebar');
+
+    menuIcon.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  </script>
+
+</body>
+</html>
+
+    
+    <button class="login-btn" onclick="login()">Login/SignUp</button>
+
+
+
+    <header>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="icon" href="icon-192.png">
+        <h1>Smart Parking</h1>
+
+        <pre>Real-Time parking occupancy monitoring with
+    intelligent slot recommendations.
+</pre>
+
+        <form id="park-form">
+            <main>
+                <div>
+                    <label for="name">Name</label>
+                    <input id="name" type="text" placeholder="Enter Name">
+                </div>
+                <div>
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="tel" placeholder="Enter Phone">
+                </div>
+                <div>
+                    <label for="email">Email</label>
+                    <input id="email" type="email" placeholder="Enter Email">
+                </div>
+                <div>
+                    <label for="dob">Date of Birth</label>
+                    <input id="dob" type="date" required>
+                </div>
+                <div>
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="slotId">Slot ID</label>
+                    <input id="slotId" placeholder="Enter Slot ID">
+                </div>
+                <div>
+                    <label for="vehicleDistance">Vehicle Distance</label>
+                    <input id="vehicleDistance" placeholder="Enter Car Distance">
+                </div>
+
+                <div>
+                    <label for="liveStatus">Live Status</label>
+                    <select id="liveStatus">
+                        <option value="" disabled selected>Select</option>
+                        <option value="OCCUPIED">Occupied</option>
+                        <option value="VACANT">Vacant</option>
+                        <option value="RECOMMENDED">Recommended</option>
+                    </select>
+                </div>
+
+                <section>
+                    <h2>Select Your Vehicle</h2>
+
+                    <label>
+                        <input type="radio" name="vehicle" value="bike">
+                        Bike — ₹20/hour
+                    </label>
+
+                    <label>
+                        <input type="radio" name="vehicle" value="car">
+                        Car — ₹40/hour
+                    </label>
+
+                    <label>
+                        <input type="radio" name="vehicle" value="suv">
+                        SUV — ₹60/hour
+                    </label>
+
+                    <label>
+                        <input type="radio" name="vehicle" value="big">
+                        Big Vehicle — ₹80/hour
+                    </label>
+                </section>
+
+                <div>
+                    <label>Subscription Plan</label>
+                    <label><input type="radio" name="subscription" value="Basic"> Basic</label>
+                    <label><input type="radio" name="subscription" value="Premium"> Premium</label>
+                    <label><input type="radio" name="subscription" value="VIP"> VIP</label>
+                </div>
+
+                <div>
+                    <label>Select Vehicle Capacity</label>
+                    <label><input type="radio" name="CAPACITY" value="CAR"> Car</label>
+                    <label><input type="radio" name="CAPACITY" value="BIKE"> Bike</label>
+                    <label><input type="radio" name="CAPACITY" value="BIG VEHICLE"> Big Vehicle</label>
+                </div>
+
+                <div style="grid-column: 1 / -1; text-align:center;">
+                    <video controls width="200" height="200">
+                        <source src="v1.mp4" type="video/mp4">
+                    </video>
+                    <br>
+                    <a href="https://dda.gov.in/policy-dynamic-parking-norms-delhi" target="_blank">Click here</a> to go to Parking Rules
+                </div>
+
+                <div>
+                    <label>
+                        <input type="checkbox" id="likeApp" name="likeApp">
+                        Do you like the app?
+                    </label>
+                </div>
+
+                <div>
+                    <input id="terms" type="checkbox" required>
+                    <label for="terms" style="display:inline; text-transform:none;">I agree to the terms and conditions</label>
+                </div>
+
+                <div>
+                    <label for="comments">Comments</label>
+                    <textarea id="comments" placeholder="Enter Your Comments" rows="4"></textarea>
+                </div>
+
+                <div>
+                    <button type="submit">Submit</button>
+                </div>
+            </main>
+        </form>
+    </header>
+
+    <h3><b>Never Circle for Parking Again.</b></h3>
+
+    <section class="reliability">
+        <h2>System Reliability</h2>
+
+        <div class="status">
+            <span>🟢 System Status</span>
+            <strong>Operational</strong>
+        </div>
+
+        <div class="status">
+            <span>📡 Parking Sensors</span>
+            <strong>Online</strong>
+        </div>
+
+        <div class="status">
+            <span>🔄 Last Updated</span>
+            <strong>10 seconds ago</strong>
+        </div>
+
+        <div class="status">
+            <span>Data Accuracy</span>
+            <strong>98.7%</strong>
+        </div>
+    </section>
+
+    <section class="parking-history">
+        <h2>Parking History</h2>
+        <p>View your previous parking sessions and bookings.</p>
+        <a href="history.html" target="_blank" class="history-btn">View Parking History</a>
+    </section>
+
+    <h4><b>TODAY'S PARKING</b></h4>
+    <ul class="today-list">
+        <li>1,248 vehicles parked</li>
+        <li>342 available slots</li>
+        <li>Avg. Parking Time: 1h 42 min</li>
+    </ul>
+
+    <section class="slot-picker">
+        <h2>Parking Slots</h2>
+
+        <div class="legend">
+            <div><span class="legend-box free"></span> Available</div>
+            <div><span class="legend-box occupied"></span> Occupied</div>
+            <div><span class="legend-box selected"></span> Selected</div>
+        </div>
+
+        <div class="vehicle-price-select">
+            <label for="slot-vehicle-type">Vehicle Type (for pricing)</label>
+            <select id="slot-vehicle-type">
+                <option value="bike" data-price="20">Bike — ₹20/hour</option>
+                <option value="car" data-price="40" selected>Car — ₹40/hour</option>
+                <option value="suv" data-price="60">SUV — ₹60/hour</option>
+                <option value="big" data-price="80">Big Vehicle — ₹80/hour</option>
+            </select>
+        </div>
+
+        <div class="parking-grid" id="parking-grid">
+            <!-- slots are injected by script.js via /api/parking -->
+        </div>
+
+        <div class="booking-box" id="booking-box" style="display:none;">
+            <p id="booking-text"></p>
+            <p id="booking-price" class="booking-price"></p>
+            <div class="booking-actions">
+                <button id="confirm-book-btn" class="book-btn" type="button">Submit &amp; Book</button>
+                <button id="cancel-select-btn" class="cancel-btn" type="button">Cancel</button>
+            </div>
+        </div>
+
+        <div class="my-bookings">
+            <h3>Your Bookings</h3>
+            <p class="bookings-hint">You can cancel a booking within 5 minutes of booking it.</p>
+            <div id="bookings-list">
+                <p class="no-bookings">No active bookings yet — select a slot above to book one.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="progress-section">
+        <h2>Parking Occupancy</h2>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <span>78%</span>
+            </div>
+        </div>
+        <p>78% Slots Occupied</p>
+    </section>
+
+    <section class="faq">
+        <h2>Frequently Asked Questions</h2>
+
+        <details>
+            <summary>How does Park Pulse work?</summary>
+            <p>Park Pulse monitors parking availability and helps users find suitable parking slots.</p>
+        </details>
+
+        <details>
+            <summary>How do I know if a slot is available?</summary>
+            <p>Check the live parking status to see whether a slot is vacant or occupied.</p>
+        </details>
+
+        <details>
+            <summary>Can I select my vehicle type?</summary>
+            <p>Yes, you can select your vehicle type and choose a suitable parking option.</p>
+        </details>
+
+        <details>
+            <summary>Is the parking status updated in real time?</summary>
+            <p>The system is designed to provide real-time parking occupancy information.</p>
+        </details>
+    </section>
+
+    <footer>
+        &copy; 2026 Park Pulse. Your comfort, our first priority.
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
